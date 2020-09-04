@@ -1,0 +1,22 @@
+fire
+inflection
+numpy
+torch
+torchvision
+soundfile
+torchaudio
+ipython
+wget
+munch
+scikit-learn
+# python >= 3.7
+# fvcore
+git+https://github.com/facebookresearch/fvcore
+# gcc >= 4.9
+# PyAV
+av
+# ffmpeg == 4.3
+moviepy
+git+https://github.com/facebookresearch/detectron2
+# webdataset
+webdataset
