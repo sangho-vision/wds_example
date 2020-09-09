@@ -21,7 +21,7 @@ bash install.sh
 
 ### Kinetics-Sounds
 * Create a directory named `datasets`.
-* Download and decompress Kinetics-Sounds([download link](https://drive.google.com/file/d/1sqSyNCGLLisl4vnlBiWRGtoFmE1mE2Rq/view?usp=sharing)) into `datasets/KineticsSounds`
+* Download and decompress Kinetics-Sounds ([download link](https://drive.google.com/file/d/1sqSyNCGLLisl4vnlBiWRGtoFmE1mE2Rq/view?usp=sharing)) into `datasets/KineticsSounds`
 
 ## Runing Experiments
 Details of experiment configuration are in `config.py`.
