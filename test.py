@@ -79,7 +79,7 @@ def test(cfg):
     # Create meters for multi-view testing.
     test_meter = TestMeter(
         len(test_loader.dataset),
-        cfg.TEST.NUM_ENSEMBLE_VIEWS * cfg.TEST.NUM_SPATIAL_CROPS,
+        cfg.TEST.DATASET_SIZE,
         cfg.MODEL.NUM_CLASSES,
         len(test_loader),
         cfg.DATA.MULTI_LABEL,
