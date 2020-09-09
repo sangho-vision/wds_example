@@ -162,7 +162,7 @@ def KineticsSounds(cfg, split):
     dataset_root = cfg.DATASET_ROOT
     if dataset_root.endswith('/'):
         dataset_root = dataset_root[:-1]
-    url = f"{dataset_root}/KineticsSounds/{split}/shard-{{000000..{max_idx:06d}}}.tar"
+    url = f"{dataset_root}/KineticsSounds/shards-{split}/shard-{{000000..{max_idx:06d}}}.tar"
     if cfg.STORAGE_SAS_KEY:
         url += cfg.STORAGE_SAS_KEY
 
