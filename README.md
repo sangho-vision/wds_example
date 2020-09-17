@@ -37,5 +37,5 @@ python run.py --cfg_file SLOWFAST_8x8_R50.yaml --test TRAIN.ENABLE False TEST.EN
 
 
 ### Note
-* As of September 4, 2020, using `MultiDataset` and `ResizedDataset` simultaneously gives rise to an AttributeError ([issue](https://github.com/tmbdev/webdataset/issues/9)). Thus, please DO NOT USE multiprocessing for data loading (that is, `DATA_LOADER.NUM_WORKERS = 0`).
-* If the above issue is solved: when using multiprocessing for data loading, the number of workers cannot exceed the number of shard `.tar` files.
+* ~~As of September 4, 2020, using `MultiDataset` and `ResizedDataset` simultaneously gives rise to an AttributeError ([issue](https://github.com/tmbdev/webdataset/issues/9)). Thus, please DO NOT USE multiprocessing for data loading (that is, `DATA_LOADER.NUM_WORKERS = 0`).~~
+* The above issue is solved: when using multiprocessing for data loading, the number of workers cannot exceed the number of shard `.tar` files.
