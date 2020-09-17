@@ -33,19 +33,19 @@ def construct_loader(cfg, split):
         batch_size = int(cfg.TRAIN.BATCH_SIZE / cfg.SOLVER.GRADIENT_ACCUMULATION_STEPS)
         batch_size = int(batch_size / du.get_world_size())
         drop_last = True
-        length = cfg.TRAIN.DATASET_SIZE
+        length = int(cfg.TRAIN.DATASET_SIZE / du.get_world_size())
         nominal = int(length / batch_size)
     elif split in ["val"]:
         dataset_name = cfg.VAL.DATASET
         batch_size = int(cfg.TRAIN.BATCH_SIZE / du.get_world_size())
         drop_last = False
-        length = cfg.VAL.DATASET_SIZE
+        length = int(cfg.VAL.DATASET_SIZE / du.get_world_size())
         nominal = int(length / batch_size)
     elif split in ["test"]:
         dataset_name = cfg.TEST.DATASET
         batch_size = int(cfg.TEST.BATCH_SIZE / du.get_world_size())
         drop_last = False
-        length = cfg.TEST.DATASET_SIZE
+        length = math.ceil(cfg.TEST.DATASET_SIZE / du.get_world_size())
         nominal = math.ceil(length / batch_size)
 
     # Construct the dataset
@@ -84,10 +84,11 @@ def shuffle_dataset(loader, cur_epoch):
         loader (loader): data loader to perform shuffle.
         cur_epoch (int): number of the current epoch.
     """
-    assert isinstance(
-        loader.sampler, (RandomSampler, DistributedSampler, _InfiniteConstantSampler)
-    ), "Sampler type '{}' not supported".format(type(loader.sampler))
-    # RandomSampler handles shuffling automatically
-    if isinstance(loader.sampler, DistributedSampler):
-        # DistributedSampler shuffles data based on epoch
-        loader.sampler.set_epoch(cur_epoch)
+    if not isinstance(loader, (wds.MultiDataset, )):
+        assert isinstance(
+            loader.sampler, (RandomSampler, DistributedSampler, _InfiniteConstantSampler)
+        ), "Sampler type '{}' not supported".format(type(loader.sampler))
+        # RandomSampler handles shuffling automatically
+        if isinstance(loader.sampler, DistributedSampler):
+            # DistributedSampler shuffles data based on epoch
+            loader.sampler.set_epoch(cur_epoch)
