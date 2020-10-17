@@ -202,6 +202,8 @@ def KineticsSounds(cfg, split):
     )
     if cfg.DATA_LOADER.NUM_WORKERS > 0:
         length = nominal
+    else:
+        nominal = length
     dataset = wds.ResizedDataset(
         dataset,
         length=length,

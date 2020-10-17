@@ -1,5 +1,5 @@
 TRAIN:
-  ENABLE: False
+  ENABLE: True
   DATASET: KineticsSounds
   DATASET_SIZE: 19215
   BATCH_SIZE: 8
@@ -8,7 +8,7 @@ VAL:
   DATASET: KineticsSounds
   DATASET_SIZE: 1316
 TEST:
-  ENABLE: True
+  ENABLE: False
   DATASET: KineticsSounds
   DATASET_SIZE: 2679
   BATCH_SIZE: 2
