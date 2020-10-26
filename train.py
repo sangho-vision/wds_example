@@ -148,7 +148,7 @@ def train(cfg):
 
     cudnn.benchmark = True
 
-    best_epoch, best_top1_err, top5_err = 0, 100.0, 100.0
+    best_epoch, best_top1_err, top5_err, best_map = 0, 100.0, 100.0, 0.0
 
     for cur_epoch in range(start_epoch, max_epoch):
         is_best_epoch = False
@@ -173,25 +173,52 @@ def train(cfg):
 
         if misc.is_eval_epoch(cfg, cur_epoch, max_epoch):
             stats = eval_epoch(val_loader, model, val_meter, cur_epoch, cfg)
-            if best_top1_err > float(stats["top1_err"]):
-                best_epoch = cur_epoch + 1
-                best_top1_err = float(stats["top1_err"])
-                top5_err = float(stats["top5_err"])
-                is_best_epoch = True
-            logger.info("BEST: Epoch: {}, Top1_err: {:.2f}, Top5_err: {:.2f}".format(best_epoch, best_top1_err, top5_err))
+            if cfg.DATA.MULTI_LABEL:
+                if best_map < float(stats["map"]):
+                    best_epoch = cur_epoch + 1
+                    best_map = float(stats["map"])
+                    is_best_epoch = True
+                logger.info(
+                    "BEST: epoch: {}, best_map: {:.2f}".format(
+                        best_epoch, best_map,
+                    )
+                )
+            else:
+                if best_top1_err > float(stats["top1_err"]):
+                    best_epoch = cur_epoch + 1
+                    best_top1_err = float(stats["top1_err"])
+                    top5_err = float(stats["top5_err"])
+                    is_best_epoch = True
+                logger.info(
+                    "BEST: epoch: {}, best_top1_err: {:.2f}, top5_err: {:.2f}".format(
+                        best_epoch, best_top1_err, top5_err
+                    )
+                )
+
+        sd = \
+            model.module.state_dict() if cfg.NUM_GPUS > 1 else \
+            model.state_dict()
+
+        ckpt = {
+            'epoch': cur_epoch + 1,
+            'model_arch': cfg.MODEL.DOWNSTREAM_ARCH,
+            'state_dict': sd,
+            'optimizer': optimizer.state_dict(),
+        }
 
         if (cur_epoch + 1) % cfg.SAVE_EVERY_EPOCH == 0 and du.get_rank() == 0:
             sd = \
                 model.module.state_dict() if cfg.NUM_GPUS > 1 else \
                 model.state_dict()
             save_checkpoint(
-                {
-                    'epoch': cur_epoch + 1,
-                    'model_arch': cfg.MODEL.DOWNSTREAM_ARCH,
-                    'state_dict': sd,
-                    'optimizer': optimizer.state_dict(),
-                },
+                ckpt,
                 filename=os.path.join(cfg.SAVE_DIR, f'epoch{cur_epoch+1}.pyth')
+            )
+
+        if is_best_epoch and du.get_rank() == 0:
+            save_checkpoint(
+                ckpt,
+                filename=os.path.join(cfg.SAVE_DIR, f"epoch_best.pyth")
             )
 
 def train_epoch(
@@ -324,8 +351,10 @@ def eval_epoch(val_loader, model, val_meter, cur_epoch, cfg):
         val_meter.log_iter_stats(cur_epoch, cur_step)
         val_meter.iter_tic()
 
-    val_meter.log_epoch_stats(cur_epoch)
+    stats = val_meter.log_epoch_stats(cur_epoch)
     val_meter.reset()
+
+    return stats
 
 
 @torch.no_grad()
